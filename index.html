@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournament Scheduler</title>
+  <style>
+    /* CSS styling code */
+    body {
+      background-color: #eaeaea;
+      font-family: Arial, sans-serif;
+      color: #333333;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ff0000;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="number"] {
+      width: 50px;
+      text-align: center;
+    }
+
+    input[type="submit"] {
+      background-color: #ff0000;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .schedule-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .schedule-table {
+      background-color: #ffffff;
+      width: 400px;
+      margin: 10px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule-table th {
+      text-align: center;
+      font-weight: bold;
+      font-size: 20px;
+      padding-bottom: 10px;
+      color: #ff0000;
+    }
+
+    .schedule-table td {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .match {
+      margin-bottom: 10px;
+    }
+
+    .team-1,
+    .team-2 {
+      font-weight: bold;
+    }
+
+    .date-time,
+    .venue {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tournament Scheduler</h1>
+
+    <form onsubmit="event.preventDefault(); generateSchedule();">
+      <label for="num-teams">Number of Teams (2-10):</label>
+      <input type="number" id="num-teams" min="2" max="10" required>
+      <br>
+      <label for="num-days">Number of Days (1-40):</label>
+      <input type="number" id="num-days" min="1" max="40" required>
+      <br>
+      <input type="submit" value="Generate Schedule">
+    </form>
+
+    <div id="schedule" class="schedule-container"></div>
+  </div>
+
+  <script>
+    // JavaScript code
+
+    function getRandomTeamNames(numTeams) {
+      var teamNames = [
+        "Team 1",
+        "Team 2",
+        "Team 3",
+        "Team 4",
+        "Team 5",
+        "Team 6",
+        "Team 7",
+        "Team 8",
+        "Team 9",
+        "Team 10"
+      ];
+
+      var randomTeamNames = [];
+
+      for (var i = 0; i < numTeams; i++) {
+        var randomIndex = Math.floor(Math.random() * teamNames.length);
+        randomTeamNames.push(teamNames[randomIndex]);
+        teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
+      }
+
+      return randomTeamNames;
+    }
+
+    function getRandomDate() {
+      var startDate = new Date(2023, 4, 1);
+      var endDate = new Date(2023, 4, 30);
+      var randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+      return randomDate.toDateString();
+    }
+
+    function getRandomTime() {
+      var hours = Math.floor(Math.random() * 24);
+      var minutes = Math.floor(Math.random() * 60);
+      var time = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+      return time;
+    }
+
+    function getRandomVenue() {
+      var venues = [
+        "Wankhede Stadium, Mumbai",
+        "Eden Gardens, Kolkata",
+        "M. Chinnaswamy Stadium, Bengaluru",
+        "Arun Jaitley Stadium, Delhi",
+        "MA Chidambaram Stadium, Chennai",
+        "Rajiv Gandhi International Cricket Stadium, Hyderabad",
+        "Sawai Mansingh Stadium, Jaipur",
+        "Punjab Cricket Association Stadium, Mohali"
+      ];
+
+      var randomIndex = Math.floor(Math.random() * venues.length);
+      return venues[randomIndex];
+    }
+
+    function generateSchedule() {
+      var numTeams = parseInt(document.getElementById("num-teams").value);
+      var numDays = parseInt(document.getElementById("num-days").value);
+
+      if (isNaN(numTeams) || isNaN(numDays) || numTeams < 2 || numTeams > 10 || numDays < 1 || numDays > 40) {
+        alert("Please enter valid values for number of teams (2-10) and number of days (1-40).");
+        return;
+      }
+
+      var teamNames = getRandomTeamNames(numTeams);
+
+      var matches = [];
+
+      for (var i = 0; i < numDays; i++) {
+        var matchesPerDay = Math.floor(numTeams / 2);
+        var teamIndices = [];
+
+        for (var j = 0; j < matchesPerDay; j++) {
+          var teamIndex = (i + j) % numTeams;
+          teamIndices.push(teamIndex);
+        }
+
+        for (var j = 0; j < matchesPerDay; j++) {
+          var teamIndex1 = teamIndices[j];
+          var teamIndex2 = teamIndices[matchesPerDay - j - 1];
+
+          var match = {
+            team1: teamNames[teamIndex1],
+            team2: teamNames[teamIndex2],
+            date: getRandomDate(),
+            time: getRandomTime(),
+            venue: getRandomVenue()
+          };
+
+          matches.push(match);
+        }
+      }
+
+      var scheduleContainer = document.getElementById("schedule");
+      scheduleContainer.innerHTML = ""; // Clear previous schedule
+
+      for (var i = 0; i < matches.length; i++) {
+        var match = matches[i];
+
+        var table = document.createElement("table");
+        table.classList.add("schedule-table");
+
+        var tableHeader = document.createElement("th");
+        tableHeader.textContent = "Day " + (Math.floor(i / matchesPerDay) + 1);
+        table.appendChild(tableHeader);
+
+        var row = document.createElement("tr");
+
+        var team1Cell = document.createElement("td");
+        team1Cell.classList.add("team-1");
+        team1Cell.textContent = match.team1;
+        row.appendChild(team1Cell);
+
+        var vsCell = document.createElement("td");
+        vsCell.textContent = "vs";
+        row.appendChild(vsCell);
+
+        var team2Cell = document.createElement("td");
+        team2Cell.classList.add("team-2");
+        team2Cell.textContent = match.team2;
+        row.appendChild(team2Cell);
+
+        table.appendChild(row);
+
+        var dateRow = document.createElement("tr");
+        var dateCell = document.createElement("td");
+        dateCell.classList.add("date-time");
+        dateCell.setAttribute("colspan", "3");
+        dateCell.textContent = match.date + " at " + match.time;
+        dateRow.appendChild(dateCell);
+        table.appendChild(dateRow);
+
+        var venueRow = document.createElement("tr");
+        var venueCell = document.createElement("td");
+        venueCell.classList.add("venue");
+        venueCell.setAttribute("colspan", "3");
+        venueCell.textContent = "Venue: " + match.venue;
+        venueRow.appendChild(venueCell);
+        table.appendChild(venueRow);
+
+        scheduleContainer.appendChild(table);
+      }
+    }
+  </script>
+</body>
+</html>
