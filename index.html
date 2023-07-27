@@ -104,7 +104,8 @@
       <br>
       <input type="submit" value="Generate Schedule">
     </form>
-
+     
+  <!-- Container to display the generated schedule -->
     <div id="schedule" class="schedule-container"></div>
   </div>
 
@@ -125,31 +126,34 @@
     "Team 10"
   ];
 
-  // Shuffle the team names array using the Fisher-Yates shuffle algorithm
-  for (var i = teamNames.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    [teamNames[i], teamNames[j]] = [teamNames[j], teamNames[i]];
-  }
+  var randomTeamNames = [];
 
-  // Return the first numTeams names from the shuffled array
-  return teamNames.slice(0, numTeams);
+for (var i = 0; i < numTeams; i++) {
+  var randomIndex = Math.floor(Math.random() * teamNames.length);
+  randomTeamNames.push(teamNames[randomIndex]);
+  teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
 }
 
+return randomTeamNames;
+}
 
+  // Function to generate a random date within a range
     function getRandomDate() {
       var startDate = new Date(2023, 4, 1);
       var endDate = new Date(2023, 4, 30);
       var randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
       return randomDate.toDateString();
     }
-
+ 
+     // Function to generate a random time in HH:mm format
     function getRandomTime() {
       var hours = Math.floor(Math.random() * 24);
       var minutes = Math.floor(Math.random() * 60);
       var time = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
       return time;
     }
-
+   
+     // Function to generate a random venue from a predefined list
     function getRandomVenue() {
       var venues = [
         "Wankhede Stadium, Mumbai",
@@ -165,7 +169,8 @@
       var randomIndex = Math.floor(Math.random() * venues.length);
       return venues[randomIndex];
     }
-
+    
+    // Function to generate the schedule
     function generateSchedule() {
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
@@ -181,26 +186,26 @@
 
       for (var i = 0; i < numDays; i++) {
         var matchesPerDay = Math.floor(numTeams / 2);
-        var teamIndices = [];
+
+        // Ensure the team names array is limited to the user-provided number of teams
+        teamNames = teamNames.slice(0, numTeams);
 
         for (var j = 0; j < matchesPerDay; j++) {
           var teamIndex = (i + j) % numTeams;
-          teamIndices.push(teamIndex);
-        }
+          var teamIndex2 = (i + numTeams - j - 1) % numTeams;
 
-        for (var j = 0; j < matchesPerDay; j++) {
-          var teamIndex1 = teamIndices[j];
-          var teamIndex2 = teamIndices[matchesPerDay - j - 1];
+          // Additional check to avoid matches involving teams beyond the user-provided number of teams
+          if (teamIndex < numTeams && teamIndex2 < numTeams) {
+            var match = {
+              team1: teamNames[teamIndex],
+              team2: teamNames[teamIndex2],
+              date: getRandomDate(),
+              time: getRandomTime(),
+              venue: getRandomVenue()
+            };
 
-          var match = {
-            team1: teamNames[teamIndex1],
-            team2: teamNames[teamIndex2],
-            date: getRandomDate(),
-            time: getRandomTime(),
-            venue: getRandomVenue()
-          };
-
-          matches.push(match);
+            matches.push(match);
+          }
         }
       }
 
@@ -257,3 +262,9 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
