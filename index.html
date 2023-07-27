@@ -112,29 +112,29 @@
     // JavaScript code
 
     function getRandomTeamNames(numTeams) {
-      var teamNames = [
-        "Team 1",
-        "Team 2",
-        "Team 3",
-        "Team 4",
-        "Team 5",
-        "Team 6",
-        "Team 7",
-        "Team 8",
-        "Team 9",
-        "Team 10"
-      ];
+  var teamNames = [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10"
+  ];
 
-      var randomTeamNames = [];
+  // Shuffle the team names array using the Fisher-Yates shuffle algorithm
+  for (var i = teamNames.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    [teamNames[i], teamNames[j]] = [teamNames[j], teamNames[i]];
+  }
 
-      for (var i = 0; i < numTeams; i++) {
-        var randomIndex = Math.floor(Math.random() * teamNames.length);
-        randomTeamNames.push(teamNames[randomIndex]);
-        teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
-      }
+  // Return the first numTeams names from the shuffled array
+  return teamNames.slice(0, numTeams);
+}
 
-      return randomTeamNames;
-    }
 
     function getRandomDate() {
       var startDate = new Date(2023, 4, 1);
