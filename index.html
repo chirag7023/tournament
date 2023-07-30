@@ -54,6 +54,10 @@
       justify-content: center;
     }
 
+    .day-container {
+      margin: 20px;
+    }
+
     .schedule-table {
       background-color: #ffffff;
       width: 400px;
@@ -76,10 +80,6 @@
       font-size: 16px;
     }
 
-    .match {
-      margin-bottom: 10px;
-    }
-
     .team-1,
     .team-2 {
       font-weight: bold;
@@ -88,12 +88,6 @@
     .date-time,
     .venue {
       font-size: 14px;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -119,6 +113,8 @@
   <!-- JavaScript code -->
   <script>
     // JavaScript code
+
+    // Function to get random team names from a predefined list
     function getRandomTeamNames(numTeams) {
       var teamNames = [
         "Team 1",
@@ -144,6 +140,7 @@
       return randomTeamNames;
     }
 
+    // Function to get a random date between May 1, 2023, and May 30, 2023
     function getRandomDate() {
       var startDate = new Date(2023, 4, 1);
       var endDate = new Date(2023, 4, 30);
@@ -151,6 +148,7 @@
       return randomDate.toDateString();
     }
 
+    // Function to get a random time in HH:mm format
     function getRandomTime() {
       var hours = Math.floor(Math.random() * 24);
       var minutes = Math.floor(Math.random() * 60);
@@ -158,6 +156,7 @@
       return time;
     }
 
+    // Function to get a random venue from a predefined list of cricket stadiums in India
     function getRandomVenue() {
       var venues = [
         "Wankhede Stadium, Mumbai",
@@ -176,39 +175,38 @@
 
     // Main function to generate the tournament schedule with eliminator, semifinals, and final
     function generateSchedule() {
+      // Get the number of teams and days from the user input
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
 
-      // Validate user input for number of teams and days
+      // Validate the user input to ensure it is within the allowed limits
       if (isNaN(numTeams) || isNaN(numDays) || numTeams < 2 || numTeams > 10 || numDays < 1 || numDays > 40) {
         alert("Please enter valid values for number of teams (2-10) and number of days (1-40).");
         return;
       }
 
-      // Get the array of random team names
+      // Get random team names from the predefined list
       var teamNames = getRandomTeamNames(numTeams);
 
-      // Clear the schedule container before generating the schedule
-      var scheduleContainer = document.getElementById("schedule");
-      scheduleContainer.innerHTML = "";
-
-      // Calculate the number of matches per day
+      // Calculate the number of matches to be played per day
       var matchesPerDay = Math.floor(numTeams / 2);
 
-      // Number of rounds required for elimination
-      var rounds = Math.ceil(Math.log2(numTeams));
-
-      // Generate the elimination matches
+      // Initialize an array to store the matches for each day
       var matches = [];
 
-      for (var i = 0; i < rounds; i++) {
+      // Generate the matches for each day
+      var currentDay = 0; // To keep track of the current day
+      var remainingMatches = numDays * matchesPerDay; // Total matches required
+
+      for (var i = 0; i < numDays; i++) {
+        if (remainingMatches === 0) break; // Break if all matches are generated
+
         var roundMatches = [];
-        var teamsRemaining = numTeams;
 
-        for (var j = 0; j < teamsRemaining; j += 2) {
+        // Generate matches for the current day
+        for (var j = 0; j < matchesPerDay; j++) {
           var teamIndex1 = j;
-          var teamIndex2 = j + 1;
-
+          var teamIndex2 = numTeams - 1 - j;
           var match = {
             team1: teamNames[teamIndex1],
             team2: teamNames[teamIndex2],
@@ -216,18 +214,23 @@
             time: getRandomTime(),
             venue: getRandomVenue()
           };
-
           roundMatches.push(match);
         }
 
-        matches.unshift(roundMatches);
+        matches.push(roundMatches);
 
-        // Prepare the next round's teams
-        teamNames = roundMatches.map(match => match.winner || match.team1);
+        remainingMatches -= matchesPerDay; // Reduce the remaining matches
+        currentDay++;
       }
+
+      // Display the schedule in the web page
+      var scheduleContainer = document.getElementById("schedule");
+      scheduleContainer.innerHTML = ""; // Clear previous schedule
 
       // Generate the matches for each day
       for (var i = 0; i < numDays; i++) {
+        if (matches[i].length === 0) break; // Skip the day if no matches are available
+
         var dayContainer = document.createElement("div");
         dayContainer.classList.add("day-container");
 
@@ -276,32 +279,6 @@
           venueCell.textContent = "Venue: " + match.venue;
           venueRow.appendChild(venueCell);
           table.appendChild(venueRow);
-
-          // Create buttons to allow the user to pick the winning team
-          var buttonRow = document.createElement("tr");
-          var buttonCell = document.createElement("td");
-          buttonCell.classList.add("button-container");
-
-          var team1WinButton = document.createElement("button");
-          team1WinButton.textContent = match.team1 + " Wins";
-          team1WinButton.addEventListener("click", function() {
-            match.winner = match.team1;
-            team1WinButton.disabled = true;
-            team2WinButton.disabled = true;
-          });
-          buttonCell.appendChild(team1WinButton);
-
-          var team2WinButton = document.createElement("button");
-          team2WinButton.textContent = match.team2 + " Wins";
-          team2WinButton.addEventListener("click", function() {
-            match.winner = match.team2;
-            team1WinButton.disabled = true;
-            team2WinButton.disabled = true;
-          });
-          buttonCell.appendChild(team2WinButton);
-
-          buttonRow.appendChild(buttonCell);
-          table.appendChild(buttonRow);
 
           dayContainer.appendChild(table);
         }
