@@ -214,10 +214,6 @@
         var table = document.createElement("table");
         table.classList.add("schedule-table");
 
-        var tableHeader = document.createElement("th");
-        tableHeader.textContent = "Round " + (round - matchesPerDay + 1) + " to " + (round - 1);
-        table.appendChild(tableHeader);
-
         for (var i = 0; i < roundMatches.length; i++) {
           var match = roundMatches[i];
 
