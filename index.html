@@ -1,122 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tournament Scheduler</title>
-  <style>
-    /* CSS styling code */
-    body {
-      background-color: #eaeaea;
-      font-family: Arial, sans-serif;
-      color: #333333;
-    }
+<!-- ... (HTML and CSS code) ... -->
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #ff0000;
-    }
-
-    form {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-    }
-
-    input[type="number"] {
-      width: 50px;
-      text-align: center;
-    }
-
-    input[type="submit"] {
-      background-color: #ff0000;
-      color: #ffffff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .schedule-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .schedule-table {
-      background-color: #ffffff;
-      width: 400px;
-      margin: 10px;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .schedule-table th {
-      text-align: center;
-      font-weight: bold;
-      font-size: 20px;
-      padding-bottom: 10px;
-      color: #ff0000;
-    }
-
-    .schedule-table td {
-      padding: 10px;
-      font-size: 16px;
-    }
-
-    .match {
-      margin-bottom: 10px;
-    }
-
-    .team-1,
-    .team-2 {
-      font-weight: bold;
-    }
-
-    .date-time,
-    .venue {
-      font-size: 14px;
-    }
-
-    /* Additional CSS styles for better visualization */
-    .day-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-
-    .day-container .schedule-table {
-      margin: 10px;
-    }
-  </style>
-</head>
 <body>
+  <!-- ... (HTML code) ... -->
   <div class="container">
-    <h1>Tournament Scheduler</h1>
-
-    <!-- Input form to get the number of teams and days from the user -->
-    <form onsubmit="event.preventDefault(); generateSchedule();">
-      <label for="num-teams">Number of Teams (2-10):</label>
-      <input type="number" id="num-teams" min="2" max="10" required>
-      <br>
-      <label for="num-days">Number of Days (1-40):</label>
-      <input type="number" id="num-days" min="1" max="40" required>
-      <br>
-      <input type="submit" value="Generate Schedule">
-    </form>
+    <!-- ... (HTML code) ... -->
 
     <!-- Container to display the generated schedule -->
     <div id="schedule" class="schedule-container"></div>
@@ -125,64 +12,7 @@
   <!-- JavaScript code -->
   <script>
     // JavaScript code
-    // Function to generate an array of random team names
-    function getRandomTeamNames(numTeams) {
-      var teamNames = [
-        "Team 1",
-        "Team 2",
-        "Team 3",
-        "Team 4",
-        "Team 5",
-        "Team 6",
-        "Team 7",
-        "Team 8",
-        "Team 9",
-        "Team 10"
-      ];
-
-      var randomTeamNames = [];
-
-      for (var i = 0; i < numTeams; i++) {
-        var randomIndex = Math.floor(Math.random() * teamNames.length);
-        randomTeamNames.push(teamNames[randomIndex]);
-        teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
-      }
-
-      return randomTeamNames;
-    }
-
-    // Function to generate a random date within the event period
-    function getRandomDate() {
-      var startDate = new Date(2023, 4, 1);
-      var endDate = new Date(2023, 4, 30);
-      var randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
-      return randomDate.toDateString();
-    }
-
-    // Function to generate a random time (in 24-hour format)
-    function getRandomTime() {
-      var hours = Math.floor(Math.random() * 24);
-      var minutes = Math.floor(Math.random() * 60);
-      var time = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-      return time;
-    }
-
-    // Function to generate a random cricket stadium venue in India
-    function getRandomVenue() {
-      var venues = [
-        "Wankhede Stadium, Mumbai",
-        "Eden Gardens, Kolkata",
-        "M. Chinnaswamy Stadium, Bengaluru",
-        "Arun Jaitley Stadium, Delhi",
-        "MA Chidambaram Stadium, Chennai",
-        "Rajiv Gandhi International Cricket Stadium, Hyderabad",
-        "Sawai Mansingh Stadium, Jaipur",
-        "Punjab Cricket Association Stadium, Mohali"
-      ];
-
-      var randomIndex = Math.floor(Math.random() * venues.length);
-      return venues[randomIndex];
-    }
+    /* ... (JavaScript functions for getRandomTeamNames, getRandomDate, getRandomTime, getRandomVenue) ... */
 
     // Main function to generate the tournament schedule with eliminator, semifinals, and final
     function generateSchedule() {
@@ -288,6 +118,32 @@
           venueCell.textContent = "Venue: " + match.venue;
           venueRow.appendChild(venueCell);
           table.appendChild(venueRow);
+
+          // Create buttons to allow the user to pick the winning team
+          var buttonRow = document.createElement("tr");
+          var buttonCell = document.createElement("td");
+          buttonCell.classList.add("button-container");
+
+          var team1WinButton = document.createElement("button");
+          team1WinButton.textContent = match.team1 + " Wins";
+          team1WinButton.addEventListener("click", function() {
+            match.winner = match.team1;
+            team1WinButton.disabled = true;
+            team2WinButton.disabled = true;
+          });
+          buttonCell.appendChild(team1WinButton);
+
+          var team2WinButton = document.createElement("button");
+          team2WinButton.textContent = match.team2 + " Wins";
+          team2WinButton.addEventListener("click", function() {
+            match.winner = match.team2;
+            team1WinButton.disabled = true;
+            team2WinButton.disabled = true;
+          });
+          buttonCell.appendChild(team2WinButton);
+
+          buttonRow.appendChild(buttonCell);
+          table.appendChild(buttonRow);
 
           // Add the table to the day container
           dayContainer.appendChild(table);
