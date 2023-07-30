@@ -54,10 +54,14 @@
       justify-content: center;
     }
 
+    .day-container {
+      margin: 20px;
+    }
+
     .schedule-table {
       background-color: #ffffff;
-      width: 400px;
-      margin: 10px;
+      width: 300px;
+      margin-bottom: 20px;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -76,10 +80,6 @@
       font-size: 16px;
     }
 
-    .match {
-      margin-bottom: 10px;
-    }
-
     .team-1,
     .team-2 {
       font-weight: bold;
@@ -95,6 +95,7 @@
   <div class="container">
     <h1>Tournament Scheduler</h1>
 
+    <!-- Input form to get the number of teams and days from the user -->
     <form onsubmit="event.preventDefault(); generateSchedule();">
       <label for="num-teams">Number of Teams (2-10):</label>
       <input type="number" id="num-teams" min="2" max="10" required>
@@ -104,56 +105,57 @@
       <br>
       <input type="submit" value="Generate Schedule">
     </form>
-     
-  <!-- Container to display the generated schedule -->
+
+    <!-- Container to display the generated schedule -->
     <div id="schedule" class="schedule-container"></div>
   </div>
 
   <script>
     // JavaScript code
 
+    // Function to generate random team names based on the given number of teams
     function getRandomTeamNames(numTeams) {
-  var teamNames = [
-    "Team 1",
-    "Team 2",
-    "Team 3",
-    "Team 4",
-    "Team 5",
-    "Team 6",
-    "Team 7",
-    "Team 8",
-    "Team 9",
-    "Team 10"
-  ];
+      var teamNames = [
+        "Team 1",
+        "Team 2",
+        "Team 3",
+        "Team 4",
+        "Team 5",
+        "Team 6",
+        "Team 7",
+        "Team 8",
+        "Team 9",
+        "Team 10"
+      ];
 
-  var randomTeamNames = [];
+      var randomTeamNames = [];
 
-for (var i = 0; i < numTeams; i++) {
-  var randomIndex = Math.floor(Math.random() * teamNames.length);
-  randomTeamNames.push(teamNames[randomIndex]);
-  teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
-}
+      for (var i = 0; i < numTeams; i++) {
+        var randomIndex = Math.floor(Math.random() * teamNames.length);
+        randomTeamNames.push(teamNames[randomIndex]);
+        teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
+      }
 
-return randomTeamNames;
-}
+      return randomTeamNames;
+    }
 
-  // Function to generate a random date within a range
+    // Function to generate a random date within a range
     function getRandomDate() {
       var startDate = new Date(2023, 4, 1);
       var endDate = new Date(2023, 4, 30);
       var randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
       return randomDate.toDateString();
     }
- 
-     // Function to generate a random time in HH:mm format
+
+    // Function to generate a random time in HH:mm format
     function getRandomTime() {
       var hours = Math.floor(Math.random() * 24);
       var minutes = Math.floor(Math.random() * 60);
       var time = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
       return time;
     }
-   
-     // Function to generate a random venue from a predefined list
+
+    // Function to generate a random venue from a predefined list
     function getRandomVenue() {
       var venues = [
         "Wankhede Stadium, Mumbai",
@@ -169,102 +171,92 @@ return randomTeamNames;
       var randomIndex = Math.floor(Math.random() * venues.length);
       return venues[randomIndex];
     }
-    
+
     // Function to generate the schedule
     function generateSchedule() {
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
 
+      // Validate user input for number of teams and days
       if (isNaN(numTeams) || isNaN(numDays) || numTeams < 2 || numTeams > 10 || numDays < 1 || numDays > 40) {
         alert("Please enter valid values for number of teams (2-10) and number of days (1-40).");
         return;
       }
 
+      // Limit the team names array to the user-provided number of teams
       var teamNames = getRandomTeamNames(numTeams);
 
-      var matches = [];
-
-      for (var i = 0; i < numDays; i++) {
-        var matchesPerDay = Math.floor(numTeams / 2);
-
-        // Ensure the team names array is limited to the user-provided number of teams
-        teamNames = teamNames.slice(0, numTeams);
-
-        for (var j = 0; j < matchesPerDay; j++) {
-          var teamIndex = (i + j) % numTeams;
-          var teamIndex2 = (i + numTeams - j - 1) % numTeams;
-
-          // Additional check to avoid matches involving teams beyond the user-provided number of teams
-          if (teamIndex < numTeams && teamIndex2 < numTeams) {
-            var match = {
-              team1: teamNames[teamIndex],
-              team2: teamNames[teamIndex2],
-              date: getRandomDate(),
-              time: getRandomTime(),
-              venue: getRandomVenue()
-            };
-
-            matches.push(match);
-          }
-        }
-      }
-
+      // Clear the schedule container before generating the schedule
       var scheduleContainer = document.getElementById("schedule");
-      scheduleContainer.innerHTML = ""; // Clear previous schedule
+      scheduleContainer.innerHTML = "";
 
-      for (var i = 0; i < matches.length; i++) {
-        var match = matches[i];
+      // Calculate the number of matches per day
+      var matchesPerDay = Math.floor(numTeams / 2);
 
-        var table = document.createElement("table");
-        table.classList.add("schedule-table");
+      // Generate the matches for each day
+      for (var i = 0; i < numDays; i++) {
+        // Create a container for each day
+        var dayContainer = document.createElement("div");
+        dayContainer.classList.add("day-container");
 
-        var tableHeader = document.createElement("th");
-        tableHeader.textContent = "Day " + (Math.floor(i / matchesPerDay) + 1);
-        table.appendChild(tableHeader);
+        // Create tables for matches on this day
+        for (var j = 0; j < matchesPerDay; j++) {
+          var match = {
+            team1: teamNames[j],
+            team2: teamNames[numTeams - j - 1],
+            date: getRandomDate(),
+            time: getRandomTime(),
+            venue: getRandomVenue()
+          };
 
-        var row = document.createElement("tr");
+          var table = document.createElement("table");
+          table.classList.add("schedule-table");
 
-        var team1Cell = document.createElement("td");
-        team1Cell.classList.add("team-1");
-        team1Cell.textContent = match.team1;
-        row.appendChild(team1Cell);
+          var tableHeader = document.createElement("th");
+          tableHeader.textContent = "Day " + (i + 1);
+          table.appendChild(tableHeader);
 
-        var vsCell = document.createElement("td");
-        vsCell.textContent = "vs";
-        row.appendChild(vsCell);
+          var row = document.createElement("tr");
 
-        var team2Cell = document.createElement("td");
-        team2Cell.classList.add("team-2");
-        team2Cell.textContent = match.team2;
-        row.appendChild(team2Cell);
+          var team1Cell = document.createElement("td");
+          team1Cell.classList.add("team-1");
+          team1Cell.textContent = match.team1;
+          row.appendChild(team1Cell);
 
-        table.appendChild(row);
+          var vsCell = document.createElement("td");
+          vsCell.textContent = "vs";
+          row.appendChild(vsCell);
 
-        var dateRow = document.createElement("tr");
-        var dateCell = document.createElement("td");
-        dateCell.classList.add("date-time");
-        dateCell.setAttribute("colspan", "3");
-        dateCell.textContent = match.date + " at " + match.time;
-        dateRow.appendChild(dateCell);
-        table.appendChild(dateRow);
+          var team2Cell = document.createElement("td");
+          team2Cell.classList.add("team-2");
+          team2Cell.textContent = match.team2;
+          row.appendChild(team2Cell);
 
-        var venueRow = document.createElement("tr");
-        var venueCell = document.createElement("td");
-        venueCell.classList.add("venue");
-        venueCell.setAttribute("colspan", "3");
-        venueCell.textContent = "Venue: " + match.venue;
-        venueRow.appendChild(venueCell);
-        table.appendChild(venueRow);
+          table.appendChild(row);
 
-        scheduleContainer.appendChild(table);
+          var dateRow = document.createElement("tr");
+          var dateCell = document.createElement("td");
+          dateCell.classList.add("date-time");
+          dateCell.setAttribute("colspan", "3");
+          dateCell.textContent = match.date + " at " + match.time;
+          dateRow.appendChild(dateCell);
+          table.appendChild(dateRow);
+
+          var venueRow = document.createElement("tr");
+          var venueCell = document.createElement("td");
+          venueCell.classList.add("venue");
+          venueCell.setAttribute("colspan", "3");
+          venueCell.textContent = "Venue: " + match.venue;
+          venueRow.appendChild(venueCell);
+          table.appendChild(venueRow);
+
+          dayContainer.appendChild(table);
+        }
+
+        // Add the container for this day to the schedule container
+        scheduleContainer.appendChild(dayContainer);
       }
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
