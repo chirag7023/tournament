@@ -89,6 +89,18 @@
     .venue {
       font-size: 14px;
     }
+
+    /* Additional CSS styles for better visualization */
+    .day-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .day-container .schedule-table {
+      margin: 10px;
+    }
   </style>
 </head>
 <body>
@@ -110,9 +122,9 @@
     <div id="schedule" class="schedule-container"></div>
   </div>
 
+  <!-- JavaScript code -->
   <script>
     // JavaScript code
-
     // Function to generate an array of random team names
     function getRandomTeamNames(numTeams) {
       var teamNames = [
@@ -172,7 +184,7 @@
       return venues[randomIndex];
     }
 
-    // Main function to generate the tournament schedule
+    // Main function to generate the tournament schedule with eliminator, semifinals, and final
     function generateSchedule() {
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
@@ -193,18 +205,20 @@
       // Calculate the number of matches per day
       var matchesPerDay = Math.floor(numTeams / 2);
 
-      // Generate the matches for each day
-      for (var i = 0; i < numDays; i++) {
-        // Create a container for each day
-        var dayContainer = document.createElement("div");
-        dayContainer.classList.add("day-container");
+      // Number of rounds required for elimination
+      var rounds = Math.ceil(Math.log2(numTeams));
 
-        // Create tables for matches on this day
-        for (var j = 0; j < matchesPerDay; j++) {
+      // Generate the elimination matches
+      var matches = [];
+
+      for (var i = 0; i < rounds; i++) {
+        var roundMatches = [];
+        var teamsRemaining = numTeams;
+
+        for (var j = 0; j < teamsRemaining; j += 2) {
           var teamIndex1 = j;
-          var teamIndex2 = numTeams - j - 1;
+          var teamIndex2 = j + 1;
 
-          // Create a match object with random date, time, and venue
           var match = {
             team1: teamNames[teamIndex1],
             team2: teamNames[teamIndex2],
@@ -213,7 +227,27 @@
             venue: getRandomVenue()
           };
 
-          // Create a table to display the match details
+          roundMatches.push(match);
+        }
+
+        matches.unshift(roundMatches);
+
+        // Prepare the next round's teams
+        teamNames = roundMatches.map(match => match.winner || match.team1);
+      }
+
+      // Generate the matches for each day
+      for (var i = 0; i < numDays; i++) {
+        // Create a container for each day
+        var dayContainer = document.createElement("div");
+        dayContainer.classList.add("day-container");
+
+        // Create tables for matches on this day
+        var roundMatches = matches[i];
+
+        for (var j = 0; j < roundMatches.length; j++) {
+          var match = roundMatches[j];
+
           var table = document.createElement("table");
           table.classList.add("schedule-table");
 
