@@ -54,14 +54,10 @@
       justify-content: center;
     }
 
-    .day-container {
-      margin: 20px;
-    }
-
     .schedule-table {
       background-color: #ffffff;
-      width: 300px;
-      margin-bottom: 20px;
+      width: 400px;
+      margin: 10px;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -78,6 +74,10 @@
     .schedule-table td {
       padding: 10px;
       font-size: 16px;
+    }
+
+    .match {
+      margin-bottom: 10px;
     }
 
     .team-1,
@@ -113,7 +113,7 @@
   <script>
     // JavaScript code
 
-    // Function to generate random team names based on the given number of teams
+    // Function to generate an array of random team names
     function getRandomTeamNames(numTeams) {
       var teamNames = [
         "Team 1",
@@ -139,7 +139,7 @@
       return randomTeamNames;
     }
 
-    // Function to generate a random date within a range
+    // Function to generate a random date within the event period
     function getRandomDate() {
       var startDate = new Date(2023, 4, 1);
       var endDate = new Date(2023, 4, 30);
@@ -147,7 +147,7 @@
       return randomDate.toDateString();
     }
 
-    // Function to generate a random time in HH:mm format
+    // Function to generate a random time (in 24-hour format)
     function getRandomTime() {
       var hours = Math.floor(Math.random() * 24);
       var minutes = Math.floor(Math.random() * 60);
@@ -155,7 +155,7 @@
       return time;
     }
 
-    // Function to generate a random venue from a predefined list
+    // Function to generate a random cricket stadium venue in India
     function getRandomVenue() {
       var venues = [
         "Wankhede Stadium, Mumbai",
@@ -172,7 +172,7 @@
       return venues[randomIndex];
     }
 
-    // Function to generate the schedule
+    // Main function to generate the tournament schedule
     function generateSchedule() {
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
@@ -183,7 +183,7 @@
         return;
       }
 
-      // Limit the team names array to the user-provided number of teams
+      // Get the array of random team names
       var teamNames = getRandomTeamNames(numTeams);
 
       // Clear the schedule container before generating the schedule
@@ -201,14 +201,19 @@
 
         // Create tables for matches on this day
         for (var j = 0; j < matchesPerDay; j++) {
+          var teamIndex1 = j;
+          var teamIndex2 = numTeams - j - 1;
+
+          // Create a match object with random date, time, and venue
           var match = {
-            team1: teamNames[j],
-            team2: teamNames[numTeams - j - 1],
+            team1: teamNames[teamIndex1],
+            team2: teamNames[teamIndex2],
             date: getRandomDate(),
             time: getRandomTime(),
             venue: getRandomVenue()
           };
 
+          // Create a table to display the match details
           var table = document.createElement("table");
           table.classList.add("schedule-table");
 
@@ -250,10 +255,11 @@
           venueRow.appendChild(venueCell);
           table.appendChild(venueRow);
 
+          // Add the table to the day container
           dayContainer.appendChild(table);
         }
 
-        // Add the container for this day to the schedule container
+        // Add the day container to the main schedule container
         scheduleContainer.appendChild(dayContainer);
       }
     }
