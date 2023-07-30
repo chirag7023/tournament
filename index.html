@@ -98,7 +98,6 @@
       font-weight: bold;
     }
 
-    .date-time,
     .venue {
       font-size: 14px;
     }
@@ -215,9 +214,6 @@
       // Limit the number of teams to a maximum of 10
       numTeams = Math.min(numTeams, 10);
 
-      // Get random team names
-      var teamNames = getRandomTeamNames(numTeams);
-
       // Calculate matches per day
       var matchesPerDay = Math.floor(numTeams / 2);
 
@@ -246,10 +242,8 @@
           var teamIndex2 = numTeams - j - 1;
 
           var match = {
-            team1: teamNames[teamIndex1],
-            team2: teamNames[teamIndex2],
-            date: getRandomDate(),
-            time: getRandomTime(),
+            team1: "Team " + (teamIndex1 + 1),
+            team2: "Team " + (teamIndex2 + 1),
             venue: getRandomVenue()
           };
 
@@ -257,7 +251,7 @@
           table.classList.add("schedule-table");
 
           var tableHeader = document.createElement("th");
-          tableHeader.textContent = match.date;
+          tableHeader.textContent = "Match " + (j + 1);
           table.appendChild(tableHeader);
 
           var row = document.createElement("tr");
@@ -277,14 +271,6 @@
           row.appendChild(team2Cell);
 
           table.appendChild(row);
-
-          var dateRow = document.createElement("tr");
-          var dateCell = document.createElement("td");
-          dateCell.classList.add("date-time");
-          dateCell.setAttribute("colspan", "3");
-          dateCell.textContent = match.date + " at " + match.time;
-          dateRow.appendChild(dateCell);
-          table.appendChild(dateRow);
 
           var venueRow = document.createElement("tr");
           var venueCell = document.createElement("td");
