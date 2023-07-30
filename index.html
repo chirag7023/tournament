@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournament Scheduler</title>
   <style>
-    /* CSS styling code */
+    /* CSS styling rules for various elements */
     body {
       background-color: #eaeaea;
       font-family: Arial, sans-serif;
@@ -54,10 +54,6 @@
       justify-content: center;
     }
 
-    .day-container {
-      margin: 20px;
-    }
-
     .schedule-table {
       background-color: #ffffff;
       width: 400px;
@@ -91,9 +87,14 @@
 
     .total-matches {
       text-align: center;
-      margin-bottom: 10px;
+      font-size: 20px;
       font-weight: bold;
+      margin-bottom: 20px;
       color: #ff0000;
+    }
+
+    .day-container {
+      margin-bottom: 30px;
     }
   </style>
 </head>
@@ -101,7 +102,7 @@
   <div class="container">
     <h1>Tournament Scheduler</h1>
 
-    <form id="generate-form">
+    <form onsubmit="event.preventDefault(); generateSchedule();">
       <label for="num-teams">Number of Teams (2-10):</label>
       <input type="number" id="num-teams" min="2" max="10" required>
       <br>
@@ -118,6 +119,7 @@
 
   <script>
     // JavaScript code
+
     function getRandomTeamNames(numTeams) {
       var teamNames = [
         "Team 1",
@@ -137,28 +139,10 @@
       for (var i = 0; i < numTeams; i++) {
         var randomIndex = Math.floor(Math.random() * teamNames.length);
         randomTeamNames.push(teamNames[randomIndex]);
-        teamNames.splice(randomIndex, 1); // Remove selected name to avoid repetition
+        teamNames.splice(randomIndex, 1);
       }
 
       return randomTeamNames;
-    }
-
-    function getTotalMatches(numTeams) {
-      return (numTeams - 1) * numTeams / 2;
-    }
-
-    function getRandomDate() {
-      var startDate = new Date(2023, 4, 1);
-      var endDate = new Date(2023, 4, 30);
-      var randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
-      return randomDate.toDateString();
-    }
-
-    function getRandomTime() {
-      var hours = Math.floor(Math.random() * 24);
-      var minutes = Math.floor(Math.random() * 60);
-      var time = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-      return time;
     }
 
     function getRandomVenue() {
@@ -177,23 +161,6 @@
       return venues[randomIndex];
     }
 
-    function getRandomMatch(teams, scheduledMatches) {
-      var team1Index, team2Index;
-      do {
-        team1Index = Math.floor(Math.random() * teams.length);
-        team2Index = Math.floor(Math.random() * teams.length);
-      } while (team1Index === team2Index || isMatchScheduled(team1Index, team2Index, scheduledMatches));
-
-      return { team1Index, team2Index };
-    }
-
-    function isMatchScheduled(team1Index, team2Index, scheduledMatches) {
-      return scheduledMatches.some(match => (
-        (match.team1Index === team1Index && match.team2Index === team2Index) ||
-        (match.team1Index === team2Index && match.team2Index === team1Index)
-      ));
-    }
-
     function generateSchedule() {
       var numTeams = parseInt(document.getElementById("num-teams").value);
       var numDays = parseInt(document.getElementById("num-days").value);
@@ -204,18 +171,24 @@
       }
 
       numTeams = Math.min(numTeams, 10);
-      var totalMatches = getTotalMatches(numTeams);
+
+      var rounds = numTeams - 1;
+      var matchesPerDay = Math.ceil(rounds / numDays);
+
+      var totalMatches = (numTeams - 1) * numTeams / 2;
+
+      var totalMatchesElement = document.getElementById("total-matches");
+      totalMatchesElement.textContent = "Total Matches: " + totalMatches;
 
       var scheduleContainer = document.getElementById("schedule");
       scheduleContainer.innerHTML = "";
 
       var teams = getRandomTeamNames(numTeams);
-      var scheduledMatches = [];
 
       var day = 1;
       var round = 1;
 
-      while (round <= totalMatches) {
+      while (round <= rounds) {
         var dayContainer = document.createElement("div");
         dayContainer.classList.add("day-container");
 
@@ -224,11 +197,9 @@
         dayContainer.appendChild(dayHeader);
 
         var roundMatches = [];
-        var matchesPerDay = Math.min(totalMatches - round + 1, numTeams / 2);
         for (var match = 0; match < matchesPerDay; match++) {
-          var matchInfo = getRandomMatch(teams, scheduledMatches);
-          var teamIndex1 = matchInfo.team1Index;
-          var teamIndex2 = matchInfo.team2Index;
+          var teamIndex1 = (day + round + match - 2) % numTeams;
+          var teamIndex2 = (day + rounds + round - match - 1) % numTeams;
 
           var matchInfo = {
             team1: teams[teamIndex1],
@@ -236,7 +207,6 @@
             venue: getRandomVenue()
           };
 
-          scheduledMatches.push({ team1Index, team2Index });
           roundMatches.push(matchInfo);
           round++;
         }
@@ -277,21 +247,12 @@
         dayContainer.appendChild(table);
         scheduleContainer.appendChild(dayContainer);
 
-        if (round > totalMatches && day < numDays) {
+        if (round > rounds && day < numDays) {
           day++;
           round = 1;
         }
       }
-
-      var totalMatchesDisplay = document.getElementById("total-matches");
-      totalMatchesDisplay.textContent = "Total Matches: " + totalMatches;
     }
-
-    // Trigger generateSchedule() when the form is submitted
-    document.getElementById("generate-form").addEventListener("submit", function(event) {
-      event.preventDefault();
-      generateSchedule();
-    });
   </script>
 </body>
 </html>
