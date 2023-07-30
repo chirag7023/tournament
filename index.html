@@ -101,7 +101,7 @@
   <div class="container">
     <h1>Tournament Scheduler</h1>
 
-    <form onsubmit="event.preventDefault(); generateSchedule();">
+    <form id="generate-form">
       <label for="num-teams">Number of Teams (2-10):</label>
       <input type="number" id="num-teams" min="2" max="10" required>
       <br>
@@ -118,7 +118,6 @@
 
   <script>
     // JavaScript code
-
     function getRandomTeamNames(numTeams) {
       var teamNames = [
         "Team 1",
@@ -287,6 +286,12 @@
       var totalMatchesDisplay = document.getElementById("total-matches");
       totalMatchesDisplay.textContent = "Total Matches: " + totalMatches;
     }
+
+    // Trigger generateSchedule() when the form is submitted
+    document.getElementById("generate-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      generateSchedule();
+    });
   </script>
 </body>
 </html>
